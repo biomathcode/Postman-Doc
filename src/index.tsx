@@ -190,6 +190,14 @@ const SpacePageView = () => {
     await getSettings("workspaceid")
   );
 
+  const [isOpen, setOpen] = useState(false);
+
+  const [isForm, setForm] = useState(false);
+
+  const input = 'http://localhost:3000'
+
+  const [collectionId, setCollectionId] = useState('');
+
   const [data, setData] = useState({collections: [
     {
       id: 'e367387c-8da5-49cc-8ac6-62572232c9ec', 
@@ -220,11 +228,15 @@ const SpacePageView = () => {
   }, []);
 
 
-  const createPost = async (key, id) => {
+  const createPost = async (key, id, input) => {
+
+    input = input || 'http://locahost:3000';
    
 
     const urlId = "https://api.getpostman.com/collections/" + id
     console.log(urlId);
+
+
 
     const newRequest = await api.fetch(urlId, 
     {
@@ -239,31 +251,31 @@ const SpacePageView = () => {
 
     const name = collectionData.collection.item.map((el) => {
        const title = h(el.name, "h2");
-       const request = el?.request?.method ? p(tag(el?.request?.method,requestColor[el?.request?.method || 'GET'] ) + "   " + el.name) : ''
+       const request = el?.request?.method ? p(tag(el?.request?.method,requestColor[el?.request?.method || 'GET'] ) + "   " + el.name) : '';
 
-       const requestEndpoint = "http://localhost:3000"
-          ? ("http://localhost:3000" + "/" + el?.request?.url?.path?.join("/"))
+       const requestEndpoint =  input
+          ? (input + "/" + el?.request?.url?.path?.join("/"))
           : el?.request?.url?.raw;
 
-        const endpoint = codeBlock(requestEndpoint, "text")
-       const code = el?.request?.body?.raw ? codeBlock(el?.request?.body?.raw,el?.request?.body?.options?.raw?.language) : "";
+      const endpoint = el.request ?  codeBlock(requestEndpoint, "text") : "";
+       const code = el?.request?.body?.raw ? (`<p>Body</p>` + codeBlock(el?.request?.body?.raw,el?.request?.body?.options?.raw?.language)) : "";
 
       const insideItems =  el?.item?.map((sub) => {
         const title = h(sub.name, "h4");
-        const request = sub?.request?.method ? p(tag(sub?.request?.method,requestColor[el?.request?.method || "GET"] ) + "   " + sub?.name) : '';
+        const request = sub?.request?.method ? p(tag(sub?.request?.method,requestColor[sub?.request?.method || "GET"] ) + "   " + sub?.name) : '';
 
-        const requestEndpoint = "http://localhost:3000"
-           ? ("http://localhost:3000" + "/" + sub?.request?.url?.path?.join("/"))
+        const requestEndpoint = input
+           ? (input + "/" + sub?.request?.url?.path?.join("/"))
            : sub?.request?.url?.raw;
  
          const endpoint = codeBlock(requestEndpoint, "text") 
-        const code = sub?.request?.body?.raw ? codeBlock(sub?.request?.body?.raw,sub?.request?.body?.options?.raw?.language) : "";
+        const code = sub?.request?.body?.raw ? (`<p>Body</p>` + codeBlock(sub?.request?.body?.raw,sub?.request?.body?.options?.raw?.language)) : "";
 
-        return title + request + endpoint+ `<p>Body</p>` + code + divider();
+        return title + request + endpoint+  code + divider();
       }).join('')
       
 
-      return title + request + endpoint+ `<p>Body</p>` + code + insideItems;
+      return title + request + endpoint+  code + insideItems;
     }).join('');
     
     function randomNumber(){  return Math.floor(Math.random() * 100)} 
@@ -271,35 +283,6 @@ const SpacePageView = () => {
 
 
     const title =  collectionData.collection.info.name + " #" +  randomNumber();
-
-
-
-    const decision = decisionBanner('This is a decision');
-
-    const ColorText = p(t("this is the red Color", TextColorPalette.red[0]))
-
-
-
-
-     const Title = h('This is the  headring', 'h1')
-
-     const description = h('this is description', 'h3');
-
-   const code = codeBlock(`{Pratik: 'sharma'}`, 'json');
-
-
-   const codeJavascript = codeBlock(`function print() {console.log('Pratik Sharma')}`, 'javascript');
-
-
-   const Testq = Title + description + code + codeJavascript
-
-    const ExpandContnet = expand('what is Music?', "<p>anything which makes you dance is a form of self expression is music</p>")
-
-    const TwoLayoutString = twoLayout( p('Layout first coolumn'), p('this is'),'two_right_sidebar');
-
-    const threeLayoug = threeLayout(p('Layout Three 1'), p('2'), p('3'), 'three_equal');
-
-    const emojiText = `<p> 🔥 ✍🏻  ✅ </p>`
 
     console.log(name);
 
@@ -323,15 +306,46 @@ const SpacePageView = () => {
   body:JSON.stringify(jsondata),
 });
 
+
   console.log(response);
   console.log(`Response: ${response.status} ${response.statusText}`);
     
   }
 
-  console.log("this is the data ", data);
+
 
   return (
     <Fragment>
+      <Fragment>
+      {isOpen && (
+      <ModalDialog header="We Created documentation for your collection. Thank You " onClose={() => setOpen(false)}>
+        <Text>Please Refresh the Page</Text>
+      </ModalDialog>
+    )}
+
+      </Fragment>
+    
+<Fragment>
+{
+                isForm && (
+                  <ModalDialog header="Postman doc config" onClose={() => setForm(false)}>
+                    <Form
+                      onSubmit={async (data) => {
+                        console.log(data, collectionId);
+                        await createPost(context.spaceKey, collectionId, data.baseUrl);
+                        setForm(false);
+                        setOpen(true);
+                      }}
+                    >
+                      <TextField label="baseUrl" name="baseUrl" defaultValue={input} />
+                    </Form>
+                  </ModalDialog>
+                )
+                }
+</Fragment>
+
+
+   
       <SectionMessage title="Welcome to Postman Doc">
         <Text>
           Postman doc helps your kick start documenting your REST APIS. We provied Macro, Space Page dedicated to generating documentation from your Postman Collections. 
@@ -356,6 +370,7 @@ const SpacePageView = () => {
                 <Row>
                 <Cell>
                 <Text>
+                
                   
                     {collection?.name + "   "  }   <DateLozenge value={new Date(collection.createdAt).getTime() }/>
                   </Text>
@@ -363,7 +378,7 @@ const SpacePageView = () => {
                 </Cell>
                 <Cell>
                   <Tooltip text={"Click to create a new Documentation of Collection " + collection.name}>
-                  <Button text="+ Create Doc" onClick={() => createPost(context.spaceKey, collection.id)}/>
+                  <Button text="+ Create Doc" onClick={() => { setCollectionId(collection.id), setForm(true)}}/>
 
                   </Tooltip>
                 </Cell>
