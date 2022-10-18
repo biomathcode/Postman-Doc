@@ -29,7 +29,7 @@ import ForgeUI, {
   Tooltip,
 } from "@forge/ui";
 import { getSettings, saveSettings } from "./storage";
-import { codeBlock, t, DecisionBanner, h, p, TagStatus, TextColorPalette, Expand, TwoLayout, ThreeLayout } from "./ui";
+import { codeBlock, t, decisionBanner, h, p, tag, TextColorPalette, expand, twoLayout, threeLayout, divider } from "./ui";
 
 
 // https://confluence.atlassian.com/doc/confluence-storage-format-790796544.html
@@ -38,6 +38,17 @@ import { codeBlock, t, DecisionBanner, h, p, TagStatus, TextColorPalette, Expand
 // request to custom elements
 
 //'default' | 'inprogress' | 'moved' | 'new' | 'removed' | 'success';
+
+const requestColor = {
+  "GET": "Green", 
+  "POST": "Blue", 
+  "PUT": "Purple", 
+  "DELETE": "Red", 
+  "PATCH": "Orange",
+  "OPTIONS":"Default", 
+  "HEAD": "Green", 
+  "TRACE": "Default", 
+}
 
 const requestTypes = {
   "GET": "success",
@@ -226,18 +237,44 @@ const SpacePageView = () => {
     const collectionData = await newRequest.json();
 
 
-    const name = collectionData.collection.item.map((el) =>   p(el.name  + " " + TagStatus("Something", "Red"))).join('');
+    const name = collectionData.collection.item.map((el) => {
+       const title = h(el.name, "h2");
+       const request = el?.request?.method ? p(tag(el?.request?.method,requestColor[el?.request?.method || 'GET'] ) + "   " + el.name) : ''
+
+       const requestEndpoint = "http://localhost:3000"
+          ? ("http://localhost:3000" + "/" + el?.request?.url?.path?.join("/"))
+          : el?.request?.url?.raw;
+
+        const endpoint = codeBlock(requestEndpoint, "text")
+       const code = el?.request?.body?.raw ? codeBlock(el?.request?.body?.raw,el?.request?.body?.options?.raw?.language) : "";
+
+      const insideItems =  el?.item?.map((sub) => {
+        const title = h(sub.name, "h4");
+        const request = sub?.request?.method ? p(tag(sub?.request?.method,requestColor[el?.request?.method || "GET"] ) + "   " + sub?.name) : '';
+
+        const requestEndpoint = "http://localhost:3000"
+           ? ("http://localhost:3000" + "/" + sub?.request?.url?.path?.join("/"))
+           : sub?.request?.url?.raw;
+ 
+         const endpoint = codeBlock(requestEndpoint, "text") 
+        const code = sub?.request?.body?.raw ? codeBlock(sub?.request?.body?.raw,sub?.request?.body?.options?.raw?.language) : "";
+
+        return title + request + endpoint+ `<p>Body</p>` + code + divider();
+      }).join('')
+      
+
+      return title + request + endpoint+ `<p>Body</p>` + code + insideItems;
+    }).join('');
+    
+    function randomNumber(){  return Math.floor(Math.random() * 100)} 
 
 
-    function randomNumber(){  return Math.random() * 100}
+
+    const title =  collectionData.collection.info.name + " #" +  randomNumber();
 
 
 
-    const title =  collectionData.collection.info.name + randomNumber();
-
-
-
-    const decision = DecisionBanner('This is a decision');
+    const decision = decisionBanner('This is a decision');
 
     const ColorText = p(t("this is the red Color", TextColorPalette.red[0]))
 
@@ -256,20 +293,22 @@ const SpacePageView = () => {
 
    const Testq = Title + description + code + codeJavascript
 
-    const ExpandContnet = Expand('what is Music?', "<p>anything which makes you dance is a form of self expression is music</p>")
+    const ExpandContnet = expand('what is Music?', "<p>anything which makes you dance is a form of self expression is music</p>")
 
-    const TwoLayoutString = TwoLayout( p('Layout first coolumn'), p('this is'),'two_right_sidebar');
+    const TwoLayoutString = twoLayout( p('Layout first coolumn'), p('this is'),'two_right_sidebar');
 
-    const threeLayoug = ThreeLayout(p('Layout Three 1'), p('2'), p('3'), 'three_equal');
+    const threeLayoug = threeLayout(p('Layout Three 1'), p('2'), p('3'), 'three_equal');
 
     const emojiText = `<p> 🔥 ✍🏻  ✅ </p>`
+
+    console.log(name);
 
     const jsondata = {"type":"page",
  "title":title,
  "space": {"key": "COOLHEAD" },
  "body": {
   "storage": {
-    "value":  Testq+ emojiText+ TwoLayoutString + TwoLayoutString +  threeLayoug+ ExpandContnet + name + decision +  ColorText,
+    "value":  name,
     "representation": "storage"
   },
  }  
@@ -335,12 +374,7 @@ const SpacePageView = () => {
             })}
 
           </Table>
-        
-           
-     
-         
-            
-          
+
         </Fragment>
      
     </Fragment>
@@ -362,8 +396,8 @@ const ConfigSettings = () => {
   const [updated, setUpdated] = useState(false);
 
   const onSubmit = async (formData) => {
-    saveSettings("apikey", formData.postmanAPIkey);
-    saveSettings("workspaceid", formData.workspaceID);
+    await saveSettings("apikey", formData.postmanAPIkey);
+   await saveSettings("workspaceid", formData.workspaceID);
 
     setApiKey(formData.postmanAPIkey);
     setWorkspaceID(formData.workspaceID);

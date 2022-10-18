@@ -444,10 +444,10 @@ export const p = (text: string) => {
 };
 
 export const t = (text:string, color: string) => {
-    return `<span style="color: ${color};">${text}</span> `
+    return `<span style="color: ${color};">${text}</span>`
 }
 
-type HeadingType = "h1" | "h2" | "h3" | null;
+type HeadingType = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | null;
 
 export const h = (text: string, type: HeadingType) => {
   switch (type) {
@@ -457,6 +457,12 @@ export const h = (text: string, type: HeadingType) => {
       return `<h2>${text}</h2>`;
     case "h3":
       return `<h3>${text}</h3>`;
+    case "h4": 
+      return `<h4>${text}</h4>`;
+    case "h5": 
+      return `<h5>${text}</h5>`;
+    case "h6": 
+      return `<h6>${text}</h6>`;
     default:
       return `<p>${text}</p>`;
   }
@@ -464,22 +470,22 @@ export const h = (text: string, type: HeadingType) => {
 
 type TagColor = "Red" | "Blue" | "Yellow" | "Green" | "Purple";
 
-export const TagStatus = (text:string, color: TagColor) => {
+export const tag = (text:string, color: TagColor) => {
   return `<ac:structured-macro ac:name="status" ac:schema-version="1"><ac:parameter ac:name="title">${text}</ac:parameter><ac:parameter ac:name="colour">${color}</ac:parameter></ac:structured-macro>`;
 };
 
-export const DateLozenge = (date: Date) => {
+export const date = (date: Date) => {
   return `<time datetime=${new Date(date).getTime()} />`;
 };
 
-export const SectionBanner = () => {
+export const sectionBanner = () => {
   return `
 
         `;
 };
 
 // DecisionType =  unordered list > list items.
-export const DecisionBanner = (text: string) => {
+export const decisionBanner = (text: string) => {
   return `
 <ac:adf-extension>
 <ac:adf-node type="decision-list">
@@ -496,7 +502,7 @@ type TwoLayoutType = 'two_equal'  | 'two_right_sidebar' | 'two_left_sidebar' ;
 
 type ThreeLayoutType = 'three_with_sidebars' | 'three_equal';
 
-export const TwoLayout = (first:string, second:string, type:TwoLayoutType) => {
+export const twoLayout = (first:string, second:string, type:TwoLayoutType) => {
   return `
   <p/>
   <ac:layout-section ac:type="${type}" ac:breakout-mode="default">
@@ -509,7 +515,7 @@ export const TwoLayout = (first:string, second:string, type:TwoLayoutType) => {
 
 
 
-export const ThreeLayout = (first:string, second:string, third:string, type: ThreeLayoutType = 'three_equal') => {
+export const threeLayout = (first:string, second:string, third:string, type: ThreeLayoutType = 'three_equal') => {
   return `
   <p/>
   <ac:layout-section ac:type="${type}" ac:breakout-mode="default">
@@ -523,7 +529,7 @@ export const ThreeLayout = (first:string, second:string, third:string, type: Thr
 
 //ac:macro-id="a23f38c0-a2e3-4f79-9002-f1bc641dd3ec"
 
-export const Expand = (title:string, content:string) => {
+export const expand = (title:string, content:string) => {
   return `
   <ac:structured-macro ac:name="expand" ac:schema-version="1" >
   <ac:parameter ac:name="title">${title}</ac:parameter>
@@ -533,19 +539,14 @@ export const Expand = (title:string, content:string) => {
 
 
 
-export const Divider = () => {
+export const divider = () => {
   return `<hr/>`;
 };
 
-export const QuoteBlock = (text) => {
+export const quoteBlock = (text) => {
   return `<blockquote><p>${text}</p> </blockquote`;
 };
 
-
-
-export const emoji = (emoji) => {
-  return ``;
-};
 
 
 export const codeBlock = (code, language:SupportedLanguages) => {
@@ -554,13 +555,7 @@ export const codeBlock = (code, language:SupportedLanguages) => {
   <![CDATA[${code}]]></ac:plain-text-body></ac:structured-macro>`;
 };
 
-enum StatusType {
-  red,
-  green,
-  orange,
-  blue,
-  purple,
-}
+
 
 // structure of the requests is something like
 // <p/>
