@@ -10,7 +10,7 @@ modules:
     - key: context-action-key
       function: context
       title: Postman doc
-      description: Adds Postman Doc to your confluence
+      description: Adds Postman Doc to confluence
   confluence:spaceSettings:
     - key: space-settings
       function: space
