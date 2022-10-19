@@ -209,10 +209,10 @@ const SpacePageView = () => {
   message: 'Not found'
 });
 
-  const context = useProductContext();
+  const SpaceContext = useProductContext();
 
   useEffect(async () => {
-    console.log("this is the getdata function starting", apiKey, workspaceID);
+    
     const response = await api.fetch(
       `https://api.getpostman.com/collections?workspace=${workspaceID}`,
       {
@@ -221,9 +221,9 @@ const SpacePageView = () => {
         },
       },
     );
-    console.log("this is the response", response);
+
     const json = await response.json();
-    console.log(json);
+  
     setData(json);
   }, []);
 
@@ -234,7 +234,7 @@ const SpacePageView = () => {
    
 
     const urlId = "https://api.getpostman.com/collections/" + id
-    console.log(urlId);
+
 
 
 
@@ -284,7 +284,7 @@ const SpacePageView = () => {
 
     const title =  collectionData.collection.info.name + " #" +  randomNumber();
 
-    console.log(name);
+
 
     const jsondata = {"type":"page",
  "title":title,
@@ -306,9 +306,6 @@ const SpacePageView = () => {
   body:JSON.stringify(jsondata),
 });
 
-
-  console.log(response);
-  console.log(`Response: ${response.status} ${response.statusText}`);
     
   }
 
@@ -331,8 +328,8 @@ const SpacePageView = () => {
                   <ModalDialog header="Postman doc config" onClose={() => setForm(false)}>
                     <Form
                       onSubmit={async (data) => {
-                        console.log(data, collectionId);
-                        await createPost(context.spaceKey, collectionId, data.baseUrl);
+                        
+                        await createPost(SpaceContext.spaceKey, collectionId, data.baseUrl);
                         setForm(false);
                         setOpen(true);
                       }}
