@@ -288,7 +288,7 @@ const SpacePageView = () => {
 
     const jsondata = {"type":"page",
  "title":title,
- "space": {"key": "COOLHEAD" },
+ "space": {"key": key },
  "body": {
   "storage": {
     "value":  name,
