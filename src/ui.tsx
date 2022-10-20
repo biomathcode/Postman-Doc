@@ -555,6 +555,22 @@ export const codeBlock = (code, language:SupportedLanguages) => {
   <![CDATA[${code}]]></ac:plain-text-body></ac:structured-macro>`;
 };
 
+export const table = (content:string) => {
+  return `<table><tbody>${content}</tbody></table>`
+}
+
+export const tr_header = (data: Array<string>) => {
+  const headers = data.map((el) => `<th><p><strong>${el}</strong></p></th>`).join('');
+
+  return `<tr>${headers}</tr>`
+}
+
+export const tr_row = (data: Array<string>)  => {
+  const content = data.map((el) => `<td><p>${el}</p></td>`).join('');
+
+  return `<tr>${content}</tr>`
+}
+
 
 
 // structure of the requests is something like

@@ -1,7 +1,10 @@
-import api, {route} from "@forge/api";
+import api, { route } from "@forge/api";
 import ForgeUI, {
   useProductContext,
-  Table, Head, Row, Cell,
+  Table,
+  Head,
+  Row,
+  Cell,
   Button,
   Code,
   ContentAction,
@@ -29,8 +32,22 @@ import ForgeUI, {
   Tooltip,
 } from "@forge/ui";
 import { getSettings, saveSettings } from "./storage";
-import { codeBlock, t, decisionBanner, h, p, tag, TextColorPalette, expand, twoLayout, threeLayout, divider } from "./ui";
-
+import {
+  codeBlock,
+  t,
+  decisionBanner,
+  h,
+  p,
+  tag,
+  TextColorPalette,
+  expand,
+  twoLayout,
+  threeLayout,
+  divider,
+  table,
+  tr_header,
+  tr_row,
+} from "./ui";
 
 // https://confluence.atlassian.com/doc/confluence-storage-format-790796544.html
 // body with table
@@ -40,25 +57,25 @@ import { codeBlock, t, decisionBanner, h, p, tag, TextColorPalette, expand, twoL
 //'default' | 'inprogress' | 'moved' | 'new' | 'removed' | 'success';
 
 const requestColor = {
-  "GET": "Green", 
-  "POST": "Blue", 
-  "PUT": "Purple", 
-  "DELETE": "Red", 
-  "PATCH": "Orange",
-  "OPTIONS":"Default", 
-  "HEAD": "Green", 
-  "TRACE": "Default", 
-}
+  GET: "Green",
+  POST: "Blue",
+  PUT: "Purple",
+  DELETE: "Red",
+  PATCH: "Orange",
+  OPTIONS: "Default",
+  HEAD: "Green",
+  TRACE: "Default",
+};
 
 const requestTypes = {
-  "GET": "success",
-  "POST": "inprogress",
-  "PUT": "new",
-  "DELETE": "removed",
-  "PATCH": "moved",
-  "OPTIONS": "default",
-  "HEAD": "success",
-  "TRACE": "default",
+  GET: "success",
+  POST: "inprogress",
+  PUT: "new",
+  DELETE: "removed",
+  PATCH: "moved",
+  OPTIONS: "default",
+  HEAD: "success",
+  TRACE: "default",
 };
 
 //
@@ -74,7 +91,7 @@ const App = () => {
   const config = useConfig() || defaultConfig;
 
   const jsonData = JSON.parse(
-    config.postmanCollection || JSON.stringify(defaultConfig),
+    config.postmanCollection || JSON.stringify(defaultConfig)
   );
   return (
     <Fragment>
@@ -82,15 +99,15 @@ const App = () => {
 
       {jsonData?.item?.map((el) => {
         const requestEndpoint = config.baseUrl
-          ? (config?.baseUrl + "/" + el?.request?.url?.path?.join("/"))
+          ? config?.baseUrl + "/" + el?.request?.url?.path?.join("/")
           : el?.request?.url?.raw;
         return (
           <Fragment key={el}>
             <Heading size="medium">{el?.name}</Heading>
-            
+
             {el?.item?.map((sub) => {
               const requestEndpoint = config.baseUrl
-                ? (config?.baseUrl + "/" + sub?.request?.url?.path?.join("/"))
+                ? config?.baseUrl + "/" + sub?.request?.url?.path?.join("/")
                 : sub?.request?.url?.raw;
 
               return (
@@ -98,9 +115,11 @@ const App = () => {
                   <Text>
                     <StatusLozenge
                       text={sub?.request?.method}
-                      appearance={requestTypes[sub?.request?.method] ||
-                        "default"}
-                    />{"     "}
+                      appearance={
+                        requestTypes[sub?.request?.method] || "default"
+                      }
+                    />
+                    {"     "}
                     <Strong>{sub?.name}</Strong>
                   </Text>
                   <Text>
@@ -119,7 +138,8 @@ const App = () => {
               <StatusLozenge
                 text={el?.request?.method}
                 appearance={requestTypes[el?.request?.method] || "default"}
-              />{"     "}
+              />
+              {"     "}
               <Strong>{el?.name}</Strong>
             </Text>
             <Text>
@@ -144,11 +164,7 @@ const defaultConfig = {
   },
 };
 
-export const run = render(
-  <Macro
-    app={<App />}
-  />,
-);
+export const run = render(<Macro app={<App />} />);
 
 const Context = () => {
   const [isOpen, setOpen] = useState(true);
@@ -167,228 +183,316 @@ const Context = () => {
 export const context = render(
   <ContentAction>
     <Context />
-  </ContentAction>,
+  </ContentAction>
 );
 
 type headerItem = {
-  key: string, 
-  value: string, 
-}
-
+  key: string;
+  value: string;
+};
 
 type responseItem = {
-  name: string
+  name: string;
   request: {
-    method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "OPTION" | "Head", 
-    headers: [headerItem]
-  }
-}
+    method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "OPTION" | "Head";
+    headers: [headerItem];
+  };
+};
 
 const SpacePageView = () => {
   const [apiKey, setApiKey] = useState(async () => await getSettings("apikey"));
-  const [workspaceID, setWorkspaceID] = useState(async () =>
-    await getSettings("workspaceid")
+  const [workspaceID, setWorkspaceID] = useState(
+    async () => await getSettings("workspaceid")
   );
 
   const [isOpen, setOpen] = useState(false);
 
   const [isForm, setForm] = useState(false);
 
-  const input = 'http://localhost:3000'
+  const input = "http://localhost:3000";
 
-  const [collectionId, setCollectionId] = useState('');
+  const [collectionId, setCollectionId] = useState("");
 
-  const [data, setData] = useState({collections: [
-    {
-      id: 'e367387c-8da5-49cc-8ac6-62572232c9ec', 
-      name: 'Atku', 
-      createdAt: '2022-07-17T12:28:59.000Z',
-
-    }
-  ],
-  message: 'Not found'
-});
+  const [data, setData] = useState({
+    collections: [
+      {
+        id: "e367387c-8da5-49cc-8ac6-62572232c9ec",
+        name: "Atku",
+        createdAt: "2022-07-17T12:28:59.000Z",
+      },
+    ],
+    message: "Not found",
+  });
 
   const SpaceContext = useProductContext();
 
   useEffect(async () => {
-    
     const response = await api.fetch(
       `https://api.getpostman.com/collections?workspace=${workspaceID}`,
       {
         headers: {
           "X-API-Key": apiKey,
         },
-      },
+      }
     );
 
     const json = await response.json();
-  
+
     setData(json);
   }, []);
 
+  const createPost = async (key: string, id: string, input: string) => {
+    input = input || "http://locahost:3000";
 
-  const createPost = async (key, id, input) => {
+    const urlId = "https://api.getpostman.com/collections/" + id;
 
-    input = input || 'http://locahost:3000';
-   
-
-    const urlId = "https://api.getpostman.com/collections/" + id
-
-
-
-
-    const newRequest = await api.fetch(urlId, 
-    {
+    const newRequest = await api.fetch(urlId, {
       headers: {
-      "X-API-Key": apiKey,
-
-      }
-    })
+        "X-API-Key": apiKey,
+      },
+    });
 
     const collectionData = await newRequest.json();
 
+    const name = collectionData.collection.item
+      .map((el) => {
+        const title = h(el.name, "h2");
 
-    const name = collectionData.collection.item.map((el) => {
-       const title = h(el.name, "h2");
-       const request = el?.request?.method ? p(tag(el?.request?.method,requestColor[el?.request?.method || 'GET'] ) + "   " + el.name) : '';
+        const description = el.description
+          ? expand("description", el.description)
+          : "";
 
-       const requestEndpoint =  input
-          ? (input + "/" + el?.request?.url?.path?.join("/"))
-          : el?.request?.url?.raw;
+        const request = el?.request?.method
+          ? p(
+              tag(
+                el?.request?.method,
+                requestColor[el?.request?.method || "GET"]
+              ) +
+                "   " +
+                el.name
+            )
+          : "";
 
-      const endpoint = el.request ?  codeBlock(requestEndpoint, "text") : "";
-       const code = el?.request?.body?.raw ? (`<p>Body</p>` + codeBlock(el?.request?.body?.raw,el?.request?.body?.options?.raw?.language)) : "";
-
-      const insideItems =  el?.item?.map((sub) => {
-        const title = h(sub.name, "h4");
-        const request = sub?.request?.method ? p(tag(sub?.request?.method,requestColor[sub?.request?.method || "GET"] ) + "   " + sub?.name) : '';
+        const headers =
+          el?.request?.header?.length > 0
+            ? table(
+                tr_header(["key", "value"]) +
+                  el?.request?.header
+                    .map((vl) => tr_row([vl?.key, vl?.value]))
+                    .join("")
+              )
+            : "";
 
         const requestEndpoint = input
-           ? (input + "/" + sub?.request?.url?.path?.join("/"))
-           : sub?.request?.url?.raw;
- 
-         const endpoint = codeBlock(requestEndpoint, "text") 
-        const code = sub?.request?.body?.raw ? (`<p>Body</p>` + codeBlock(sub?.request?.body?.raw,sub?.request?.body?.options?.raw?.language)) : "";
+          ? input + "/" + el?.request?.url?.path?.join("/")
+          : el?.request?.url?.raw;
 
-        return title + request + endpoint+  code + divider();
-      }).join('')
-      
+        const endpoint = el.request ? codeBlock(requestEndpoint, "text") : "";
+        const code = el?.request?.body?.raw
+          ? `<p>Body</p>` +
+            codeBlock(
+              el?.request?.body?.raw,
+              el?.request?.body?.options?.raw?.language
+            )
+          : "";
 
-      return title + request + endpoint+  code + insideItems;
-    }).join('');
-    
-    function randomNumber(){  return Math.floor(Math.random() * 100)} 
+        const insideItems = el?.item
+          ? el?.item
+              ?.map((sub) => {
+                const title = h(sub.name, "h4");
+                const description = sub?.description
+                  ? expand("description", sub.description)
+                  : "";
 
+                const headers =
+                  sub?.request?.header?.length > 0
+                    ? expand(
+                        "headers",
+                        table(
+                          tr_header(["key", "value"]) +
+                            sub?.request?.header
+                              .map((vl) => tr_row([vl?.key, vl?.value]))
+                              .join("")
+                        )
+                      )
+                    : "";
 
+                const request = sub?.request?.method
+                  ? p(
+                      tag(
+                        sub?.request?.method,
+                        requestColor[sub?.request?.method || "GET"]
+                      ) +
+                        "   " +
+                        sub?.name
+                    )
+                  : "";
 
-    const title =  collectionData.collection.info.name + " #" +  randomNumber();
+                const requestEndpoint = input
+                  ? input + "/" + sub?.request?.url?.path?.join("/")
+                  : sub?.request?.url?.raw;
 
+                const endpoint = el.request
+                  ? codeBlock(requestEndpoint, "text")
+                  : "";
+                const code = sub?.request?.body?.raw
+                  ? `<p>Body</p>` +
+                    codeBlock(
+                      sub?.request?.body?.raw,
+                      sub?.request?.body?.options?.raw?.language
+                    )
+                  : "";
 
+                return (
+                  title +
+                  description +
+                  headers +
+                  request +
+                  endpoint +
+                 
+                  code +
+                  divider()
+                );
+              })
+              .join("")
+          : "";
 
-    const jsondata = {"type":"page",
- "title":title,
- "space": {"key": key },
- "body": {
-  "storage": {
-    "value":  name,
-    "representation": "storage"
-  },
- }  
-     }
+        return (
+          title +
+          description +
+          headers +
+          request +
+          endpoint +
+          code +
+          insideItems
+        );
+      })
+      .join("");
 
- const response = await api.asApp().requestConfluence(route`/wiki/rest/api/content`, {
-  method: 'POST',
-  headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-  },
-  body:JSON.stringify(jsondata),
-});
+    function randomNumber() {
+      return Math.floor(Math.random() * 100);
+    }
 
-    
-  }
+    const title = collectionData.collection.info.name + " #" + randomNumber();
 
+    const description = collectionData.collection.info.description
+      ? expand("description", collectionData.collection.info.description)
+      : "";
 
+    const jsondata = {
+      type: "page",
+      title: title,
+      space: { key: key },
+      body: {
+        storage: {
+          value: description + name,
+          representation: "storage",
+        },
+      },
+    };
+
+    const response = await api
+      .asApp()
+      .requestConfluence(route`/wiki/rest/api/content`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(jsondata),
+      });
+    console.log(response);
+  };
 
   return (
     <Fragment>
       <Fragment>
-      {isOpen && (
-      <ModalDialog header="We Created documentation for your collection. Thank You " onClose={() => setOpen(false)}>
-        <Text>Please Refresh the Page</Text>
-      </ModalDialog>
-    )}
-
+        {isOpen && (
+          <ModalDialog
+            header="We Created documentation for your collection. Thank You "
+            onClose={() => setOpen(false)}
+          >
+            <Text>Please Refresh the Page</Text>
+          </ModalDialog>
+        )}
       </Fragment>
-    
-<Fragment>
-{
-                isForm && (
-                  <ModalDialog header="Postman doc config" onClose={() => setForm(false)}>
-                    <Form
-                      onSubmit={async (data) => {
-                        
-                        await createPost(SpaceContext.spaceKey, collectionId, data.baseUrl);
-                        setForm(false);
-                        setOpen(true);
-                      }}
-                    >
-                      <TextField label="baseUrl" name="baseUrl" defaultValue={input} />
-                    </Form>
-                  </ModalDialog>
-                )
-                }
-</Fragment>
 
+      <Fragment>
+        {isForm && (
+          <ModalDialog
+            header="Postman doc config"
+            onClose={() => setForm(false)}
+          >
+            <Form
+              onSubmit={async (data) => {
+                await createPost(
+                  SpaceContext.spaceKey,
+                  collectionId,
+                  data.baseUrl
+                );
+                setForm(false);
+                setOpen(true);
+              }}
+            >
+              <TextField label="baseUrl" name="baseUrl" defaultValue={input} />
+            </Form>
+          </ModalDialog>
+        )}
+      </Fragment>
 
-   
       <SectionMessage title="Welcome to Postman Doc">
         <Text>
-          Postman doc helps your kick start documenting your REST APIS. We provied Macro, Space Page dedicated to generating documentation from your Postman Collections. 
-          <Tag text="This is change "/>
+          Postman doc helps your kick start documenting your REST APIS. We
+          provied Macro, Space Page dedicated to generating documentation from
+          your Postman Collections.
         </Text>
         <Text>
-          Please setup your Postman api key and workspace id by going to <Tag text="Status Settings"/> - <Tag text="Integrations"/> - <Tag text="Postman Doc"/> To get Started. 
+          Please setup your Postman api key and workspace id by going to{" "}
+          <Tag text="Status Settings" /> - <Tag text="Integrations" /> -{" "}
+          <Tag text="Postman Doc" /> To get Started.
         </Text>
       </SectionMessage>
-        <Fragment>
-          <Table>
-            <Head >
-              <Cell>
-                <Text>Collections</Text>
-              </Cell>
-              <Cell>
-                <Text>Action</Text>
-              </Cell>
+      <Fragment>
+        <Table>
+          <Head>
+            <Cell>
+              <Text>Collections</Text>
+            </Cell>
+            <Cell>
+              <Text>Action</Text>
+            </Cell>
           </Head>
           {data.collections.map((collection) => {
-              return (
-                <Row>
+            return (
+              <Row>
                 <Cell>
-                <Text>
-                
-                  
-                    {collection?.name + "   "  }   <DateLozenge value={new Date(collection.createdAt).getTime() }/>
+                  <Text>
+                    {collection?.name + "   "}{" "}
+                    <DateLozenge
+                      value={new Date(collection.createdAt).getTime()}
+                    />
                   </Text>
-                
                 </Cell>
                 <Cell>
-                  <Tooltip text={"Click to create a new Documentation of Collection " + collection.name}>
-                  <Button text="+ Create Doc" onClick={() => { setCollectionId(collection.id), setForm(true)}}/>
-
+                  <Tooltip
+                    text={
+                      "Click to create a new Documentation of Collection " +
+                      collection.name
+                    }
+                  >
+                    <Button
+                      text="+ Create Doc"
+                      onClick={() => {
+                        setCollectionId(collection.id), setForm(true);
+                      }}
+                    />
                   </Tooltip>
                 </Cell>
               </Row>
-                
-               
-              )
-            })}
-
-          </Table>
-
-        </Fragment>
-     
+            );
+          })}
+        </Table>
+      </Fragment>
     </Fragment>
   );
 };
@@ -396,20 +500,20 @@ const SpacePageView = () => {
 export const spacePage = render(
   <SpacePage>
     <SpacePageView />
-  </SpacePage>,
+  </SpacePage>
 );
 
 const ConfigSettings = () => {
   const [apiKey, setApiKey] = useState(async () => await getSettings("apikey"));
-  const [workspaceID, setWorkspaceID] = useState(async () =>
-    await getSettings("workspaceid")
+  const [workspaceID, setWorkspaceID] = useState(
+    async () => await getSettings("workspaceid")
   );
 
   const [updated, setUpdated] = useState(false);
 
   const onSubmit = async (formData) => {
     await saveSettings("apikey", formData.postmanAPIkey);
-   await saveSettings("workspaceid", formData.workspaceID);
+    await saveSettings("workspaceid", formData.workspaceID);
 
     setApiKey(formData.postmanAPIkey);
     setWorkspaceID(formData.workspaceID);
@@ -436,7 +540,7 @@ const ConfigSettings = () => {
 export const space = render(
   <SpaceSettings>
     <ConfigSettings />
-  </SpaceSettings>,
+  </SpaceSettings>
 );
 
 const Config = () => {
