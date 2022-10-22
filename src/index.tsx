@@ -332,16 +332,39 @@ const SpacePageView = () => {
                   ? input + "/" + sub?.request?.url?.path?.join("/")
                   : sub?.request?.url?.raw;
 
-                const endpoint = el.request
+                const endpoint = sub.request
                   ? codeBlock(requestEndpoint, "text")
                   : "";
                 const code = sub?.request?.body?.raw
-                  ? `<p>Body</p>` +
+                  ? `<h5>Body</h5>` +
                     codeBlock(
                       sub?.request?.body?.raw,
                       sub?.request?.body?.options?.raw?.language
                     )
                   : "";
+                const ResponseHeader = `<h5>Response</h5>`;
+
+                const responseData = sub?.response ?  sub?.response?.map((res) => {
+                  const title = h( tag(res?.code, String(res?.code) === '200' ? 'Green' : 'Purple')  +  '      ' +  res?.name , 'h5') 
+                   // array of key, value object
+                  const headers =
+                  res?.header?.length > 0
+                    ? 
+                        table(
+                          tr_header(["key", "value"]) +
+                            res?.header
+                              .map((vl) => tr_row([vl?.key, vl?.value]))
+                              .join("")
+                        )
+                      
+                    : "";
+                  const body = res?.body ?  codeBlock(res?.body, res?._postman_previewlanguage) : '';
+
+                  const builder = title +expand('Headers',headers )  + expand("Response Body", body) ;
+
+                  return builder;
+                }).join('') : '';
+              
 
                 return (
                   title +
@@ -349,13 +372,15 @@ const SpacePageView = () => {
                   headers +
                   request +
                   endpoint +
-                 
                   code +
+                  responseData + 
                   divider()
                 );
               })
               .join("")
           : "";
+        
+   
 
         return (
           title +
@@ -401,6 +426,7 @@ const SpacePageView = () => {
         },
         body: JSON.stringify(jsondata),
       });
+    
     console.log(response);
   };
 

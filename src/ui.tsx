@@ -504,12 +504,11 @@ type ThreeLayoutType = 'three_with_sidebars' | 'three_equal';
 
 export const twoLayout = (first:string, second:string, type:TwoLayoutType) => {
   return `
-  <p/>
   <ac:layout-section ac:type="${type}" ac:breakout-mode="default">
   <ac:layout-cell>${first}</ac:layout-cell>
   <ac:layout-cell>${second}</ac:layout-cell>
   </ac:layout-section>
-  <p/>
+
 `
 }
 
