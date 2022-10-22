@@ -530,9 +530,11 @@ export const threeLayout = (first:string, second:string, third:string, type: Thr
 
 export const expand = (title:string, content:string) => {
   return `
+  
   <ac:structured-macro ac:name="expand" ac:schema-version="1" >
   <ac:parameter ac:name="title">${title}</ac:parameter>
   <ac:rich-text-body>${content}</ac:rich-text-body></ac:structured-macro>
+  
   `
 }
 
