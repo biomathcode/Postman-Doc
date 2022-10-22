@@ -10,4 +10,8 @@
 - Integrated using the Postman API.
 - Open-sourced
 
+## Remaining TODOS
+
+[ ] Queries 
+[ ] 
 
