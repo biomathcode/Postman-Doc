@@ -12,6 +12,18 @@
 
 ## Remaining TODOS
 
-[ ] Queries 
-[ ] 
+- [ ] graphQL Queries 
+- [ ] form-data 
+- [ ] x-www-form-urlencoded 
+- [X] raw
+  - Text
+  - Javascript
+  - JSON ✅
+  - HTML
+  - XML
+- [ ] binary
+- [ ] params
+- [ ] path variables
+
+
 
