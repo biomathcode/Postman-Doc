@@ -291,31 +291,42 @@ const SpacePageView = () => {
             )
           : "";
         const graphql = el?.request?.body?.mode
-        ? `<h5>GraphQL Body</h5>` + 
-          codeBlock(
-            el?.request?.body?.graphql?.query,
-            'graphql'
-          ) 
-        : "";
-      
-        const urlencodedBody = el?.request?.body?.urlencoded?.length > 0 ? 
-        '<h5>Body</h5>' + 
-        table(
-          tr_header(["key", "value", "description"]) +
-            el?.request?.body?.urlencoded
-              ?.map((vl) => {
-                const newValue =   vl?.value?.replace(/[<>]/g, '') ;
-                const description = vl?.description?.replace(/[<()>]/g, '');
+          ? `<h5>GraphQL Body</h5>` +
+            codeBlock(el?.request?.body?.graphql?.query, "graphql")
+          : "";
 
-               return  tr_row(['key' , 'value',  'description' ])
-              } 
-              
-              )
-              .join(""),
-        )
-         : "";
+        const urlencodedBody = el?.request?.body?.urlencoded?.length > 0
+          ? expand(
+            "Body",
+            table(
+              tr_header(["key", "value"]) +
+                el?.request?.body?.urlencoded
+                  ?.map((vl) => {
+                    const newValue = vl?.value?.replace(/[<>]/g, "");
+                    return tr_row([vl?.key, newValue]);
+                  })
+                  .join(""),
+            ),
+          )
+          : "";
         
-        
+          const formData = el?.request?.body?.mode === "formdata"
+          ? expand(
+            "Body",
+            table(
+              tr_header(["key", "value"]) +
+                el?.request?.body?.formdata
+                  ?.map((vl) => {
+                    const newValue = vl?.value?.replace(
+                      /[<>]/g,
+                      "",
+                    );
+                    return tr_row([vl?.key, newValue]);
+                  })
+                  .join(""),
+            ),
+          )
+          : "";
 
         const insideItems = el?.item
           ? el?.item
@@ -362,30 +373,45 @@ const SpacePageView = () => {
                     sub?.request?.body?.options?.raw?.language,
                   )
                 : "";
-              const graphql = sub?.request?.body?.mode === 'graphql'
-                ? `<h5>GraphQL Body</h5>` + 
-                  codeBlock(
-                    sub?.request?.body?.graphql?.query,
-                    'graphql'
-                  ) 
-                : "";
-              const urlencodedBody = sub?.request?.body?.urlencoded?.length > 0  ? 
-                '<h5>Body</h5>' + 
-                table(
-                  tr_header(["key", "value" ]) +
-                    sub?.request?.body?.urlencoded
-                      ?.map((vl) => {
-                        const newValue =   vl?.value?.replace(/[<>]/g, '') ;
-                       return  tr_row([vl?.key , newValue ])
-                      } 
-                      
-                      )
-                      .join(""),
+              const formData = sub?.request?.body?.mode === "formdata"
+                ? expand(
+                  "Body",
+                  table(
+                    tr_header(["key", "value"]) +
+                      sub?.request?.body?.formdata
+                        ?.map((vl) => {
+                          const newValue = vl?.value?.replace(
+                            /[<>]/g,
+                            "",
+                          );
+                          return tr_row([vl?.key, newValue]);
+                        })
+                        .join(""),
+                  ),
                 )
-                 : "";
+                : "";
+              const graphql = sub?.request?.body?.mode === "graphql"
+                ? `<h5>GraphQL Body</h5>` +
+                  codeBlock(sub?.request?.body?.graphql?.query, "graphql")
+                : "";
+              const urlencodedBody = sub?.request?.body?.urlencoded?.length > 0
+                ? expand(
+                  "Body",
+                  table(
+                    tr_header(["key", "value"]) +
+                      sub?.request?.body?.urlencoded
+                        ?.map((vl) => {
+                          const newValue = vl?.value?.replace(
+                            /[<>]/g,
+                            "",
+                          );
+                          return tr_row([vl?.key, newValue]);
+                        })
+                        .join(""),
+                  ),
+                )
+                : "";
 
-              console.log(urlencodedBody);
-              
               const query = sub?.request?.url?.query?.length > 0
                 ? expand(
                   "query",
@@ -393,44 +419,53 @@ const SpacePageView = () => {
                     tr_header(["key", "value", "description"]) +
                       sub?.request?.url?.query
                         ?.map((vl) => {
-                          const newValue =   vl?.value?.replace(/[<>]/g, '') ;
-                         return  tr_row([vl?.key , newValue,  vl?.description ])
-                        } 
-                        
-                        )
+                          const newValue = vl?.value?.replace(
+                            /[<>]/g,
+                            "",
+                          );
+                          return tr_row([
+                            vl?.key,
+                            newValue,
+                            vl?.description,
+                          ]);
+                        })
                         .join(""),
                   ),
                 )
                 : "";
-      
 
               const responseData = sub?.response
-                ? sub?.response?.map((res) => {
-                  const title = h(
-                    tag(
-                      res?.code,
-                      String(res?.code) === "200" ? "Green" : "Purple",
-                    ) + "      " + res?.name,
-                    "h5",
-                  );
-                  // array of key, value object
-                  const headers = res?.header?.length > 0
-                    ? table(
-                      tr_header(["key", "value"]) +
-                        res?.header
-                          .map((vl) => tr_row([vl?.key, vl?.value]))
-                          .join(""),
-                    )
-                    : "";
-                  const body = res?.body
-                    ? codeBlock(res?.body, res?._postman_previewlanguage)
-                    : "";
+                ? sub?.response
+                  ?.map((res) => {
+                    const title = h(
+                      tag(
+                        res?.code,
+                        String(res?.code) === "200" ? "Green" : "Purple",
+                      ) +
+                        "      " +
+                        res?.name,
+                      "h5",
+                    );
+                    // array of key, value object
+                    const headers = res?.header?.length > 0
+                      ? table(
+                        tr_header(["key", "value"]) +
+                          res?.header
+                            .map((vl) => tr_row([vl?.key, vl?.value]))
+                            .join(""),
+                      )
+                      : "";
+                    const body = res?.body
+                      ? codeBlock(res?.body, res?._postman_previewlanguage)
+                      : "";
 
-                  const builder = title + expand("Headers", headers) +
-                    expand("Response Body", body);
+                    const builder = title +
+                      expand("Headers", headers) +
+                      expand("Response Body", body);
 
-                  return builder;
-                }).join("")
+                    return builder;
+                  })
+                  .join("")
                 : "";
 
               return (
@@ -439,10 +474,11 @@ const SpacePageView = () => {
                 headers +
                 request +
                 endpoint +
-                query + 
-                urlencodedBody + 
-                graphql + 
+                query +
+                urlencodedBody +
+                graphql +
                 code +
+                formData +
                 responseData +
                 divider()
               );
@@ -451,30 +487,37 @@ const SpacePageView = () => {
           : "";
 
         const responseData = el?.response
-          ? el?.response?.map((res) => {
-            const title = h(
-              tag(el?.code, String(el?.code) === "200" ? "Green" : "Purple") +
-                "      " + el?.name,
-              "h5",
-            );
-            // array of key, value object
-            const headers = el?.header?.length > 0
-              ? table(
-                tr_header(["key", "value"]) +
-                  el?.header
-                    .map((vl) => tr_row([vl?.key, vl?.value]))
-                    .join(""),
-              )
-              : "";
-            const body = el?.body
-              ? codeBlock(el?.body, el?._postman_previewlanguage)
-              : "";
+          ? el?.response
+            ?.map((res) => {
+              const title = h(
+                tag(
+                  el?.code,
+                  String(el?.code) === "200" ? "Green" : "Purple",
+                ) +
+                  "      " +
+                  el?.name,
+                "h5",
+              );
+              // array of key, value object
+              const headers = el?.header?.length > 0
+                ? table(
+                  tr_header(["key", "value"]) +
+                    el?.header
+                      .map((vl) => tr_row([vl?.key, vl?.value]))
+                      .join(""),
+                )
+                : "";
+              const body = el?.body
+                ? codeBlock(el?.body, el?._postman_previewlanguage)
+                : "";
 
-            const builder = title + expand("Headers", headers) +
-              expand("Response Body", body);
+              const builder = title +
+                expand("Headers", headers) +
+                expand("Response Body", body);
 
-            return builder;
-          }).join("")
+              return builder;
+            })
+            .join("")
           : "";
 
         return (
@@ -484,8 +527,9 @@ const SpacePageView = () => {
           request +
           endpoint +
           code +
-          graphql + 
-          // urlencodedBody + 
+          graphql +
+          urlencodedBody +
+          formData +
           responseData +
           insideItems +
           divider()
@@ -528,8 +572,7 @@ const SpacePageView = () => {
     const newResponse = await response.json();
 
     console.log(response);
-    console.log('This is the reason', newResponse);
-
+    console.log("This is the reason", newResponse);
   };
 
   return (

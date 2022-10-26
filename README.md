@@ -12,15 +12,15 @@
 
 ## Remaining TODOS
 
-- [X] graphQL Queries 
-- [ ] form-data 
-- [X] x-www-form-urlencoded 
-- [X] raw
-  - Text
-  - Javascript
+- [X] graphQL Queries ✅
+- [X] form-data ✅
+- [X] x-www-form-urlencoded ✅
+- [X] raw ✅
+  - Text ✅
+  - Javascript ✅
   - JSON ✅
-  - HTML
-  - XML
+  - HTML ✅
+  - XML ✅
 - [ ] binary
 - [ ] params
 - [ ] path variables
