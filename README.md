@@ -12,9 +12,9 @@
 
 ## Remaining TODOS
 
-- [ ] graphQL Queries 
+- [X] graphQL Queries 
 - [ ] form-data 
-- [ ] x-www-form-urlencoded 
+- [X] x-www-form-urlencoded 
 - [X] raw
   - Text
   - Javascript

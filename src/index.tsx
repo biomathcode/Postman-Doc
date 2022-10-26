@@ -297,6 +297,25 @@ const SpacePageView = () => {
             'graphql'
           ) 
         : "";
+      
+        const urlencodedBody = el?.request?.body?.urlencoded?.length > 0 ? 
+        '<h5>Body</h5>' + 
+        table(
+          tr_header(["key", "value", "description"]) +
+            el?.request?.body?.urlencoded
+              ?.map((vl) => {
+                const newValue =   vl?.value?.replace(/[<>]/g, '') ;
+                const description = vl?.description?.replace(/[<()>]/g, '');
+
+               return  tr_row(['key' , 'value',  'description' ])
+              } 
+              
+              )
+              .join(""),
+        )
+         : "";
+        
+        
 
         const insideItems = el?.item
           ? el?.item
@@ -343,14 +362,30 @@ const SpacePageView = () => {
                     sub?.request?.body?.options?.raw?.language,
                   )
                 : "";
-              const graphql = sub?.request?.body?.mode
+              const graphql = sub?.request?.body?.mode === 'graphql'
                 ? `<h5>GraphQL Body</h5>` + 
                   codeBlock(
                     sub?.request?.body?.graphql?.query,
                     'graphql'
                   ) 
                 : "";
+              const urlencodedBody = sub?.request?.body?.urlencoded?.length > 0  ? 
+                '<h5>Body</h5>' + 
+                table(
+                  tr_header(["key", "value" ]) +
+                    sub?.request?.body?.urlencoded
+                      ?.map((vl) => {
+                        const newValue =   vl?.value?.replace(/[<>]/g, '') ;
+                       return  tr_row([vl?.key , newValue ])
+                      } 
+                      
+                      )
+                      .join(""),
+                )
+                 : "";
 
+              console.log(urlencodedBody);
+              
               const query = sub?.request?.url?.query?.length > 0
                 ? expand(
                   "query",
@@ -405,6 +440,7 @@ const SpacePageView = () => {
                 request +
                 endpoint +
                 query + 
+                urlencodedBody + 
                 graphql + 
                 code +
                 responseData +
@@ -449,6 +485,7 @@ const SpacePageView = () => {
           endpoint +
           code +
           graphql + 
+          // urlencodedBody + 
           responseData +
           insideItems +
           divider()
@@ -488,8 +525,11 @@ const SpacePageView = () => {
         },
         body: JSON.stringify(jsondata),
       });
+    const newResponse = await response.json();
 
     console.log(response);
+    console.log('This is the reason', newResponse);
+
   };
 
   return (
