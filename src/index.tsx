@@ -5,7 +5,6 @@ import ForgeUI, {
   Code,
   ContentAction,
   DateLozenge,
-  Em,
   Form,
   Fragment,
   Head,
@@ -291,6 +290,13 @@ const SpacePageView = () => {
               el?.request?.body?.options?.raw?.language,
             )
           : "";
+        const graphql = el?.request?.body?.mode
+        ? `<h5>GraphQL Body</h5>` + 
+          codeBlock(
+            el?.request?.body?.graphql?.query,
+            'graphql'
+          ) 
+        : "";
 
         const insideItems = el?.item
           ? el?.item
@@ -336,6 +342,13 @@ const SpacePageView = () => {
                     sub?.request?.body?.raw,
                     sub?.request?.body?.options?.raw?.language,
                   )
+                : "";
+              const graphql = sub?.request?.body?.mode
+                ? `<h5>GraphQL Body</h5>` + 
+                  codeBlock(
+                    sub?.request?.body?.graphql?.query,
+                    'graphql'
+                  ) 
                 : "";
 
               const query = sub?.request?.url?.query?.length > 0
@@ -392,6 +405,7 @@ const SpacePageView = () => {
                 request +
                 endpoint +
                 query + 
+                graphql + 
                 code +
                 responseData +
                 divider()
@@ -434,6 +448,7 @@ const SpacePageView = () => {
           request +
           endpoint +
           code +
+          graphql + 
           responseData +
           insideItems +
           divider()
