@@ -220,17 +220,23 @@ const SpacePageView = () => {
 
   useEffect(async () => {
     if(apiKey !== "NOT FOUND" && workspaceID !== "NOT FOUND")  {
-      const response = await api.fetch(
-        `https://api.getpostman.com/collections?workspace=${workspaceID}`,
-        {
-          headers: {
-            "X-API-Key": apiKey,
+      try {
+        const response = await api.fetch(
+          `https://api.getpostman.com/collections?workspace=${workspaceID}`,
+          {
+            headers: {
+              "X-API-Key": apiKey,
+            },
           },
-        },
-      );
-  
-      const json = await response.json();
-      setData(json);
+        );
+    
+        const json = await response.json();
+        setData(json);
+
+      } catch(e) {
+        console.log(e);
+      }
+      
     }
   }, [apiKey, workspaceID]);
 
