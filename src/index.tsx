@@ -195,6 +195,11 @@ type responseItem = {
   };
 };
 
+// api request three conditions
+// api key is not set
+// api key is wrong
+// workspace id is wrong
+
 const SpacePageView = () => {
   const [apiKey, setApiKey] = useState(async () => await getSettings("apikey"));
   const [workspaceID, setWorkspaceID] = useState(
@@ -209,33 +214,25 @@ const SpacePageView = () => {
 
   const [collectionId, setCollectionId] = useState("");
 
-  const [data, setData] = useState({
-    collections: [
-      {
-        id: "e367387c-8da5-49cc-8ac6-62572232c9ec",
-        name: "Atku",
-        createdAt: "2022-07-17T12:28:59.000Z",
-      },
-    ],
-    message: "Not found",
-  });
+  const [data, setData] = useState(null);
 
   const SpaceContext = useProductContext();
 
   useEffect(async () => {
-    const response = await api.fetch(
-      `https://api.getpostman.com/collections?workspace=${workspaceID}`,
-      {
-        headers: {
-          "X-API-Key": apiKey,
+    if(apiKey !== "NOT FOUND" && workspaceID !== "NOT FOUND")  {
+      const response = await api.fetch(
+        `https://api.getpostman.com/collections?workspace=${workspaceID}`,
+        {
+          headers: {
+            "X-API-Key": apiKey,
+          },
         },
-      },
-    );
-
-    const json = await response.json();
-
-    setData(json);
-  }, []);
+      );
+  
+      const json = await response.json();
+      setData(json);
+    }
+  }, [apiKey, workspaceID]);
 
   const createPost = async (key: string, id: string, input: string) => {
     input = input || "http://locahost:3000";
@@ -624,7 +621,9 @@ const SpacePageView = () => {
         </Text>
       </SectionMessage>
       <Fragment>
-        <Table>
+        {
+          data ?
+          <Table>
           <Head>
             <Cell>
               <Text>Collections</Text>
@@ -633,7 +632,7 @@ const SpacePageView = () => {
               <Text>Action</Text>
             </Cell>
           </Head>
-          {data.collections.map((collection) => {
+          { data?.collections?.map((collection) => {
             return (
               <Row>
                 <Cell>
@@ -647,20 +646,25 @@ const SpacePageView = () => {
                 <Cell>
                   <Tooltip
                     text={"Click to create a new Documentation of Collection " +
-                      collection.name}
+                      collection?.name}
                   >
                     <Button
                       text="+ Create Doc"
                       onClick={() => {
-                        setCollectionId(collection.id), setForm(true);
+                        setCollectionId(collection?.id), setForm(true);
                       }}
                     />
                   </Tooltip>
                 </Cell>
               </Row>
             );
-          })}
+          }) }
         </Table>
+
+          :
+           <Text>Please set your Postman Api key and Workspace Id</Text>
+        }
+        
       </Fragment>
     </Fragment>
   );
