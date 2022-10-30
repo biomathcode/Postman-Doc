@@ -622,7 +622,7 @@ const SpacePageView = () => {
         </Text>
         <Text>
           Please setup your Postman api key and workspace id by going to{" "}
-          <Tag text="Status Settings" /> - <Tag text="Integrations" /> -{" "}
+          <Tag text="Space Settings" /> - <Tag text="Integrations" /> -{" "}
           <Tag text="Postman Doc" /> To get Started.
         </Text>
       </SectionMessage>
