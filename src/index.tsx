@@ -89,14 +89,32 @@ const renderToText = () => {
 const App = () => {
   const config = useConfig() || defaultConfig;
 
-  const jsonData = JSON.parse(
-    config.postmanCollection || JSON.stringify(defaultConfig),
-  );
+  function isJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+  const errorconfig = {
+    info: {
+      name: "Please pass valid JSON",
+    }
+  }
+  const ValidJson = isJsonString(config.postmanCollection);
+
+  const jsonData = ValidJson?  JSON.parse(
+    config.postmanCollection 
+  ) : errorconfig;
+
+  
   return (
     <Fragment>
-      <Heading size="large">{jsonData?.info?.name}</Heading>
+      
+      <Heading size="large">{jsonData?.info?.name }</Heading>
 
-      {jsonData?.item?.map((el) => {
+      {jsonData?.item?.length > 0 ?  jsonData?.item?.map((el) => {
         const requestEndpoint = config.baseUrl
           ? config?.baseUrl + "/" + el?.request?.url?.path?.join("/")
           : el?.request?.url?.raw;
@@ -149,7 +167,9 @@ const App = () => {
             )}
           </Fragment>
         );
-      })}
+      })
+      : <Text>Please add the correct json</Text>
+    }
     </Fragment>
   );
 };
