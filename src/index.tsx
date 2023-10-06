@@ -9,6 +9,7 @@ import ForgeUI, {
   Fragment,
   Head,
   Heading,
+  Link,
   Macro,
   MacroConfig,
   ModalDialog,
@@ -91,85 +92,88 @@ const App = () => {
 
   function isJsonString(str) {
     try {
-        JSON.parse(str);
+      JSON.parse(str);
     } catch (e) {
-        return false;
+      return false;
     }
     return true;
-}
+  }
   const errorconfig = {
     info: {
       name: "Please pass valid JSON",
-    }
-  }
+    },
+  };
   const ValidJson = isJsonString(config.postmanCollection);
 
-  const jsonData = ValidJson?  JSON.parse(
-    config.postmanCollection 
-  ) : errorconfig;
+  const jsonData = ValidJson
+    ? JSON.parse(config.postmanCollection)
+    : errorconfig;
 
-  
   return (
     <Fragment>
-      
-      <Heading size="large">{jsonData?.info?.name }</Heading>
+      <Heading size="large">{jsonData?.info?.name}</Heading>
 
-      {jsonData?.item?.length > 0 ?  jsonData?.item?.map((el) => {
-        const requestEndpoint = config.baseUrl
-          ? config?.baseUrl + "/" + el?.request?.url?.path?.join("/")
-          : el?.request?.url?.raw;
-        return (
-          <Fragment key={el}>
-            <Heading size="medium">{el?.name}</Heading>
+      {jsonData?.item?.length > 0 ? (
+        jsonData?.item?.map((el) => {
+          const requestEndpoint = config.baseUrl
+            ? config?.baseUrl + "/" + el?.request?.url?.path?.join("/")
+            : el?.request?.url?.raw;
+          return (
+            <Fragment key={el}>
+              <Heading size="medium">{el?.name}</Heading>
 
-            {el?.item?.map((sub) => {
-              const requestEndpoint = config.baseUrl
-                ? config?.baseUrl + "/" + sub?.request?.url?.path?.join("/")
-                : sub?.request?.url?.raw;
+              {el?.item?.map((sub) => {
+                const requestEndpoint = config.baseUrl
+                  ? config?.baseUrl + "/" + sub?.request?.url?.path?.join("/")
+                  : sub?.request?.url?.raw;
 
-              return (
-                <Fragment key={sub}>
-                  <Text>
-                    <StatusLozenge
-                      text={sub?.request?.method}
-                      appearance={requestTypes[sub?.request?.method] ||
-                        "default"}
-                    />{"     "}
-                    <Strong>{sub?.name}</Strong>
-                  </Text>
-                  <Text>
-                    <Code text={requestEndpoint} />
-                  </Text>
-                  {sub?.request?.body?.raw && (
-                    <Code
-                      text={sub?.request?.body?.raw}
-                      language={sub?.request?.body?.options?.raw?.language}
-                    />
-                  )}
-                </Fragment>
-              );
-            })}
-            <Text>
-              <StatusLozenge
-                text={el?.request?.method}
-                appearance={requestTypes[el?.request?.method] || "default"}
-              />{"     "}
-              <Strong>{el?.name}</Strong>
-            </Text>
-            <Text>
-              <Code text={requestEndpoint} />
-            </Text>
-            {el?.request?.body?.raw && (
-              <Code
-                text={el?.request?.body?.raw}
-                language={el?.request?.body?.options?.raw?.language}
-              />
-            )}
-          </Fragment>
-        );
-      })
-      : <Text>Please add the correct json</Text>
-    }
+                return (
+                  <Fragment key={sub}>
+                    <Text>
+                      <StatusLozenge
+                        text={sub?.request?.method}
+                        appearance={
+                          requestTypes[sub?.request?.method] || "default"
+                        }
+                      />
+                      {"     "}
+                      <Strong>{sub?.name}</Strong>
+                    </Text>
+                    <Text>
+                      <Code text={requestEndpoint} />
+                    </Text>
+                    {sub?.request?.body?.raw && (
+                      <Code
+                        text={sub?.request?.body?.raw}
+                        language={sub?.request?.body?.options?.raw?.language}
+                      />
+                    )}
+                  </Fragment>
+                );
+              })}
+              <Text>
+                <StatusLozenge
+                  text={el?.request?.method}
+                  appearance={requestTypes[el?.request?.method] || "default"}
+                />
+                {"     "}
+                <Strong>{el?.name}</Strong>
+              </Text>
+              <Text>
+                <Code text={requestEndpoint} />
+              </Text>
+              {el?.request?.body?.raw && (
+                <Code
+                  text={el?.request?.body?.raw}
+                  language={el?.request?.body?.options?.raw?.language}
+                />
+              )}
+            </Fragment>
+          );
+        })
+      ) : (
+        <Text>Please add the correct json</Text>
+      )}
     </Fragment>
   );
 };
@@ -199,7 +203,7 @@ const Context = () => {
 export const context = render(
   <ContentAction>
     <Context />
-  </ContentAction>,
+  </ContentAction>
 );
 
 type headerItem = {
@@ -223,8 +227,10 @@ type responseItem = {
 const SpacePageView = () => {
   const [apiKey, setApiKey] = useState(async () => await getSettings("apikey"));
   const [workspaceID, setWorkspaceID] = useState(
-    async () => await getSettings("workspaceid"),
+    async () => await getSettings("workspaceid")
   );
+
+  const [isconfig, setIsConfig] = useState(true);
 
   const [isOpen, setOpen] = useState(false);
 
@@ -239,7 +245,7 @@ const SpacePageView = () => {
   const SpaceContext = useProductContext();
 
   useEffect(async () => {
-    if(apiKey !== "NOT FOUND" && workspaceID !== "NOT FOUND")  {
+    if (apiKey !== "NOT FOUND" && workspaceID !== "NOT FOUND") {
       try {
         const response = await api.fetch(
           `https://api.getpostman.com/collections?workspace=${workspaceID}`,
@@ -247,16 +253,14 @@ const SpacePageView = () => {
             headers: {
               "X-API-Key": apiKey,
             },
-          },
+          }
         );
-    
+
         const json = await response.json();
         setData(json);
-
-      } catch(e) {
+      } catch (e) {
         console.log(e);
       }
-      
     }
   }, [apiKey, workspaceID]);
 
@@ -283,23 +287,24 @@ const SpacePageView = () => {
 
         const request = el?.request?.method
           ? p(
-            tag(
-              el?.request?.method,
-              requestColor[el?.request?.method || "GET"],
-            ) +
-              "   " +
-              el.name,
-          )
+              tag(
+                el?.request?.method,
+                requestColor[el?.request?.method || "GET"]
+              ) +
+                "   " +
+                el.name
+            )
           : "";
 
-        const headers = el?.request?.header?.length > 0
-          ? table(
-            tr_header(["key", "value"]) +
-              el?.request?.header
-                .map((vl) => tr_row([vl?.key, vl?.value]))
-                .join(""),
-          )
-          : "";
+        const headers =
+          el?.request?.header?.length > 0
+            ? table(
+                tr_header(["key", "value"]) +
+                  el?.request?.header
+                    .map((vl) => tr_row([vl?.key, vl?.value]))
+                    .join("")
+              )
+            : "";
 
         const requestEndpoint = input
           ? input + "/" + el?.request?.url?.path?.join("/")
@@ -310,7 +315,7 @@ const SpacePageView = () => {
           ? `<p>Body</p>` +
             codeBlock(
               el?.request?.body?.raw,
-              el?.request?.body?.options?.raw?.language,
+              el?.request?.body?.options?.raw?.language
             )
           : "";
         const graphql = el?.request?.body?.mode
@@ -318,229 +323,237 @@ const SpacePageView = () => {
             codeBlock(el?.request?.body?.graphql?.query, "graphql")
           : "";
 
-        const urlencodedBody = el?.request?.body?.urlencoded?.length > 0
-          ? expand(
-            "Body",
-            table(
-              tr_header(["key", "value"]) +
-                el?.request?.body?.urlencoded
-                  ?.map((vl) => {
-                    const newValue = vl?.value?.replace(/[<>]/g, "");
-                    return tr_row([vl?.key, newValue]);
-                  })
-                  .join(""),
-            ),
-          )
-          : "";
-        
-          const formData = el?.request?.body?.mode === "formdata"
-          ? expand(
-            "Body",
-            table(
-              tr_header(["key", "value"]) +
-                el?.request?.body?.formdata
-                  ?.map((vl) => {
-                    const newValue = vl?.value?.replace(
-                      /[<>]/g,
-                      "",
-                    );
-                    return tr_row([vl?.key, newValue]);
-                  })
-                  .join(""),
-            ),
-          )
-          : "";
+        const urlencodedBody =
+          el?.request?.body?.urlencoded?.length > 0
+            ? expand(
+                "Body",
+                table(
+                  tr_header(["key", "value"]) +
+                    el?.request?.body?.urlencoded
+                      ?.map((vl) => {
+                        const newValue = vl?.value?.replace(/[<>]/g, "");
+                        return tr_row([vl?.key, newValue]);
+                      })
+                      .join("")
+                )
+              )
+            : "";
+
+        const formData =
+          el?.request?.body?.mode === "formdata"
+            ? expand(
+                "Body",
+                table(
+                  tr_header(["key", "value"]) +
+                    el?.request?.body?.formdata
+                      ?.map((vl) => {
+                        const newValue = vl?.value?.replace(/[<>]/g, "");
+                        return tr_row([vl?.key, newValue]);
+                      })
+                      .join("")
+                )
+              )
+            : "";
 
         const insideItems = el?.item
           ? el?.item
-            ?.map((sub) => {
-              const title = h(sub.name, "h4");
-              const description = sub?.description
-                ? expand("description", sub.description)
-                : "";
+              ?.map((sub) => {
+                const title = h(sub.name, "h4");
+                const description = sub?.description
+                  ? expand("description", sub.description)
+                  : "";
 
-              const headers = sub?.request?.header?.length > 0
-                ? expand(
-                  "headers",
-                  table(
-                    tr_header(["key", "value"]) +
-                      sub?.request?.header
-                        .map((vl) => tr_row([vl?.key, vl?.value]))
-                        .join(""),
-                  ),
-                )
-                : "";
-
-              const request = sub?.request?.method
-                ? p(
-                  tag(
-                    sub?.request?.method,
-                    requestColor[sub?.request?.method || "GET"],
-                  ) +
-                    "   " +
-                    sub?.name,
-                )
-                : "";
-
-              const requestEndpoint = input
-                ? input + "/" + sub?.request?.url?.path?.join("/")
-                : sub?.request?.url?.raw;
-
-              const endpoint = sub.request
-                ? codeBlock(requestEndpoint, "text")
-                : "";
-              const code = sub?.request?.body?.raw
-                ? `<h5>Body</h5>` +
-                  codeBlock(
-                    sub?.request?.body?.raw,
-                    sub?.request?.body?.options?.raw?.language,
-                  )
-                : "";
-              const formData = sub?.request?.body?.mode === "formdata"
-                ? expand(
-                  "Body",
-                  table(
-                    tr_header(["key", "value"]) +
-                      sub?.request?.body?.formdata
-                        ?.map((vl) => {
-                          const newValue = vl?.value?.replace(
-                            /[<>]/g,
-                            "",
-                          );
-                          return tr_row([vl?.key, newValue]);
-                        })
-                        .join(""),
-                  ),
-                )
-                : "";
-              const graphql = sub?.request?.body?.mode === "graphql"
-                ? `<h5>GraphQL Body</h5>` +
-                  codeBlock(sub?.request?.body?.graphql?.query, "graphql")
-                : "";
-              const urlencodedBody = sub?.request?.body?.urlencoded?.length > 0
-                ? expand(
-                  "Body",
-                  table(
-                    tr_header(["key", "value"]) +
-                      sub?.request?.body?.urlencoded
-                        ?.map((vl) => {
-                          const newValue = vl?.value?.replace(
-                            /[<>]/g,
-                            "",
-                          );
-                          return tr_row([vl?.key, newValue]);
-                        })
-                        .join(""),
-                  ),
-                )
-                : "";
-
-              const query = sub?.request?.url?.query?.length > 0
-                ? expand(
-                  "query",
-                  table(
-                    tr_header(["key", "value", "description"]) +
-                      sub?.request?.url?.query
-                        ?.map((vl) => {
-                          const newValue = vl?.value?.replace(
-                            /[<>]/g,
-                            "",
-                          );
-                          return tr_row([
-                            vl?.key,
-                            newValue,
-                            vl?.description,
-                          ]);
-                        })
-                        .join(""),
-                  ),
-                )
-                : "";
-
-              const responseData = sub?.response
-                ? sub?.response
-                  ?.map((res) => {
-                    const title = h(
-                      tag(
-                        res?.code,
-                        String(res?.code) === "200" ? "Green" : "Purple",
-                      ) +
-                        "      " +
-                        res?.name,
-                      "h5",
-                    );
-                    // array of key, value object
-                    const headers = res?.header?.length > 0
-                      ? table(
-                        tr_header(["key", "value"]) +
-                          res?.header
-                            .map((vl) => tr_row([vl?.key, vl?.value]))
-                            .join(""),
+                const headers =
+                  sub?.request?.header?.length > 0
+                    ? expand(
+                        "headers",
+                        table(
+                          tr_header(["key", "value"]) +
+                            sub?.request?.header
+                              .map((vl) => tr_row([vl?.key, vl?.value]))
+                              .join("")
+                        )
                       )
-                      : "";
-                    const body = res?.body
-                      ? codeBlock(res?.body, res?._postman_previewlanguage)
-                      : "";
+                    : "";
 
-                    const builder = title +
-                      expand("Headers", headers) +
-                      expand("Response Body", body);
+                const request = sub?.request?.method
+                  ? p(
+                      tag(
+                        sub?.request?.method,
+                        requestColor[sub?.request?.method || "GET"]
+                      ) +
+                        "   " +
+                        sub?.name
+                    )
+                  : "";
 
-                    return builder;
-                  })
-                  .join("")
-                : "";
+                const requestEndpoint = input
+                  ? input + "/" + sub?.request?.url?.path?.join("/")
+                  : sub?.request?.url?.raw;
 
-              return (
-                title +
-                description +
-                headers +
-                request +
-                endpoint +
-                query +
-                urlencodedBody +
-                graphql +
-                code +
-                formData +
-                responseData +
-                divider()
-              );
-            })
-            .join("")
+                const endpoint = sub.request
+                  ? codeBlock(requestEndpoint, "text")
+                  : "";
+                const code = sub?.request?.body?.raw
+                  ? `<h5>Body</h5>` +
+                    codeBlock(
+                      sub?.request?.body?.raw,
+                      sub?.request?.body?.options?.raw?.language
+                    )
+                  : "";
+                const formData =
+                  sub?.request?.body?.mode === "formdata"
+                    ? expand(
+                        "Body",
+                        table(
+                          tr_header(["key", "value"]) +
+                            sub?.request?.body?.formdata
+                              ?.map((vl) => {
+                                const newValue = vl?.value?.replace(
+                                  /[<>]/g,
+                                  ""
+                                );
+                                return tr_row([vl?.key, newValue]);
+                              })
+                              .join("")
+                        )
+                      )
+                    : "";
+                const graphql =
+                  sub?.request?.body?.mode === "graphql"
+                    ? `<h5>GraphQL Body</h5>` +
+                      codeBlock(sub?.request?.body?.graphql?.query, "graphql")
+                    : "";
+                const urlencodedBody =
+                  sub?.request?.body?.urlencoded?.length > 0
+                    ? expand(
+                        "Body",
+                        table(
+                          tr_header(["key", "value"]) +
+                            sub?.request?.body?.urlencoded
+                              ?.map((vl) => {
+                                const newValue = vl?.value?.replace(
+                                  /[<>]/g,
+                                  ""
+                                );
+                                return tr_row([vl?.key, newValue]);
+                              })
+                              .join("")
+                        )
+                      )
+                    : "";
+
+                const query =
+                  sub?.request?.url?.query?.length > 0
+                    ? expand(
+                        "query",
+                        table(
+                          tr_header(["key", "value", "description"]) +
+                            sub?.request?.url?.query
+                              ?.map((vl) => {
+                                const newValue = vl?.value?.replace(
+                                  /[<>]/g,
+                                  ""
+                                );
+                                return tr_row([
+                                  vl?.key,
+                                  newValue,
+                                  vl?.description,
+                                ]);
+                              })
+                              .join("")
+                        )
+                      )
+                    : "";
+
+                const responseData = sub?.response
+                  ? sub?.response
+                      ?.map((res) => {
+                        const title = h(
+                          tag(
+                            res?.code,
+                            String(res?.code) === "200" ? "Green" : "Purple"
+                          ) +
+                            "      " +
+                            res?.name,
+                          "h5"
+                        );
+                        // array of key, value object
+                        const headers =
+                          res?.header?.length > 0
+                            ? table(
+                                tr_header(["key", "value"]) +
+                                  res?.header
+                                    .map((vl) => tr_row([vl?.key, vl?.value]))
+                                    .join("")
+                              )
+                            : "";
+                        const body = res?.body
+                          ? codeBlock(res?.body, res?._postman_previewlanguage)
+                          : "";
+
+                        const builder =
+                          title +
+                          expand("Headers", headers) +
+                          expand("Response Body", body);
+
+                        return builder;
+                      })
+                      .join("")
+                  : "";
+
+                return (
+                  title +
+                  description +
+                  headers +
+                  request +
+                  endpoint +
+                  query +
+                  urlencodedBody +
+                  graphql +
+                  code +
+                  formData +
+                  responseData +
+                  divider()
+                );
+              })
+              .join("")
           : "";
 
         const responseData = el?.response
           ? el?.response
-            ?.map((res) => {
-              const title = h(
-                tag(
-                  el?.code,
-                  String(el?.code) === "200" ? "Green" : "Purple",
-                ) +
-                  "      " +
-                  el?.name,
-                "h5",
-              );
-              // array of key, value object
-              const headers = el?.header?.length > 0
-                ? table(
-                  tr_header(["key", "value"]) +
-                    el?.header
-                      .map((vl) => tr_row([vl?.key, vl?.value]))
-                      .join(""),
-                )
-                : "";
-              const body = el?.body
-                ? codeBlock(el?.body, el?._postman_previewlanguage)
-                : "";
+              ?.map((res) => {
+                const title = h(
+                  tag(
+                    el?.code,
+                    String(el?.code) === "200" ? "Green" : "Purple"
+                  ) +
+                    "      " +
+                    el?.name,
+                  "h5"
+                );
+                // array of key, value object
+                const headers =
+                  el?.header?.length > 0
+                    ? table(
+                        tr_header(["key", "value"]) +
+                          el?.header
+                            .map((vl) => tr_row([vl?.key, vl?.value]))
+                            .join("")
+                      )
+                    : "";
+                const body = el?.body
+                  ? codeBlock(el?.body, el?._postman_previewlanguage)
+                  : "";
 
-              const builder = title +
-                expand("Headers", headers) +
-                expand("Response Body", body);
+                const builder =
+                  title +
+                  expand("Headers", headers) +
+                  expand("Response Body", body);
 
-              return builder;
-            })
-            .join("")
+                return builder;
+              })
+              .join("")
           : "";
 
         return (
@@ -598,6 +611,16 @@ const SpacePageView = () => {
     console.log("This is the reason", newResponse);
   };
 
+  const onSubmit = async (formData) => {
+    await saveSettings("apikey", formData.postmanAPIkey);
+    await saveSettings("workspaceid", formData.workspaceID);
+
+    setApiKey(formData.postmanAPIkey);
+    setWorkspaceID(formData.workspaceID);
+
+    // setUpdated(true);
+  };
+
   return (
     <Fragment>
       <Fragment>
@@ -622,7 +645,7 @@ const SpacePageView = () => {
                 await createPost(
                   SpaceContext.spaceKey,
                   collectionId,
-                  data.baseUrl,
+                  data.baseUrl
                 );
                 setForm(false);
                 setOpen(true);
@@ -634,64 +657,91 @@ const SpacePageView = () => {
         )}
       </Fragment>
 
-      <SectionMessage title="Welcome to Postman Doc">
-        <Text>
-          Postman doc helps your kick start documenting your REST APIS. We
-          provied Macro, Space Page dedicated to generating documentation from
-          your Postman Collections.
-        </Text>
-        <Text>
-          Please setup your Postman api key and workspace id by going to{" "}
-          <Tag text="Space Settings" /> - <Tag text="Integrations" /> -{" "}
-          <Tag text="Postman Doc" /> To get Started.
-        </Text>
-      </SectionMessage>
-      <Fragment>
-        {
-          data ?
-          <Table>
-          <Head>
-            <Cell>
-              <Text>Collections</Text>
-            </Cell>
-            <Cell>
-              <Text>Action</Text>
-            </Cell>
-          </Head>
-          { data?.collections?.map((collection) => {
-            return (
-              <Row>
-                <Cell>
-                  <Text>
-                    {collection?.name + "   "}{" "}
-                    <DateLozenge
-                      value={new Date(collection.createdAt).getTime()}
-                    />
-                  </Text>
-                </Cell>
-                <Cell>
-                  <Tooltip
-                    text={"Click to create a new Documentation of Collection " +
-                      collection?.name}
-                  >
-                    <Button
-                      text="+ Create Doc"
-                      onClick={() => {
-                        setCollectionId(collection?.id), setForm(true);
-                      }}
-                    />
-                  </Tooltip>
-                </Cell>
-              </Row>
-            );
-          }) }
-        </Table>
+      <Text>
+        We provied Macro, Space Page dedicated to generating documentation from
+        your Postman Collections. Please read a helper doc here :
+        <Link href="https://medium.com/@biomathcode/automate-api-documentation-on-atlassian-confluence-with-postman-doc-9b1f3a24eed0">
+          Click here to read me
+        </Link>
+      </Text>
 
-          :
-           <Text>Please set your Postman Api key and Workspace Id</Text>
-        }
-        
+      <Fragment>
+        {data ? (
+          <Table>
+            <Head>
+              <Cell>
+                <Text>Collections</Text>
+              </Cell>
+              <Cell>
+                <Text>Action</Text>
+              </Cell>
+            </Head>
+            {data?.collections?.map((collection) => {
+              return (
+                <Row>
+                  <Cell>
+                    <Text>
+                      {collection?.name + "   "}{" "}
+                      <DateLozenge
+                        value={new Date(collection.createdAt).getTime()}
+                      />
+                    </Text>
+                  </Cell>
+                  <Cell>
+                    <Tooltip
+                      text={
+                        "Click to create a new Documentation of Collection " +
+                        collection?.name
+                      }
+                    >
+                      <Button
+                        text="+ Create Doc"
+                        onClick={() => {
+                          setCollectionId(collection?.id), setForm(true);
+                        }}
+                      />
+                    </Tooltip>
+                  </Cell>
+                </Row>
+              );
+            })}
+          </Table>
+        ) : (
+          <Text>Please set your Postman Api key and Workspace Id</Text>
+        )}
       </Fragment>
+      {isconfig ? (
+        <Fragment>
+          <Button
+            text="Hide"
+            icon="watch"
+            appearance="subtle"
+            onClick={() => setIsConfig(false)}
+          />
+
+          <Form onSubmit={onSubmit}>
+            <TextField
+              defaultValue={apiKey || "NOT FOUND"}
+              name="postmanAPIkey"
+              description="Postman API key"
+              label="Postman API Key"
+            />
+            <TextField
+              defaultValue={workspaceID || "NOT FOUND"}
+              name="workspaceID"
+              description="Workspace API key"
+              label="Workspace id"
+            />
+          </Form>
+        </Fragment>
+      ) : (
+        <Button
+          appearance="primary"
+          icon="settings"
+          text="Set Config"
+          onClick={() => setIsConfig(true)}
+        />
+      )}
     </Fragment>
   );
 };
@@ -699,13 +749,13 @@ const SpacePageView = () => {
 export const spacePage = render(
   <SpacePage>
     <SpacePageView />
-  </SpacePage>,
+  </SpacePage>
 );
 
 const ConfigSettings = () => {
   const [apiKey, setApiKey] = useState(async () => await getSettings("apikey"));
   const [workspaceID, setWorkspaceID] = useState(
-    async () => await getSettings("workspaceid"),
+    async () => await getSettings("workspaceid")
   );
 
   const [updated, setUpdated] = useState(false);
@@ -728,8 +778,16 @@ const ConfigSettings = () => {
       </SectionMessage>
 
       <Form onSubmit={onSubmit}>
-        <TextField name="postmanAPIkey" label="Postman Api Key" />
-        <TextField name="workspaceID" label="Workspace id" />
+        <TextField
+          defaultValue={apiKey || "Not Found"}
+          name="postmanAPIkey"
+          label="Postman Api Key"
+        />
+        <TextField
+          defaultValue={apiKey || "Not Found"}
+          name="workspaceID"
+          label="Workspace id"
+        />
       </Form>
       {updated && <Text>Your change are updated</Text>}
     </Fragment>
@@ -739,7 +797,7 @@ const ConfigSettings = () => {
 export const space = render(
   <SpaceSettings>
     <ConfigSettings />
-  </SpaceSettings>,
+  </SpaceSettings>
 );
 
 const Config = () => {
