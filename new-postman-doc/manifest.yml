@@ -1,0 +1,49 @@
+modules:
+  macro:
+    - key: new-postman-doc-confluence-ui-kit-custom-config-macro
+      resource: main
+      render: native
+      resolver:
+        function: resolver
+      title: Postman Doc 2.0
+      description: Postman Doc 2.0
+      config:
+        resource: macro-config
+        viewportSize: medium
+        render: native
+        title: Config
+  confluence:spacePage:
+    - key: space-page
+      resource: space-function-page
+      resolver:
+        function: resolver
+      render: native
+      title: Postman Doc 2.0
+      route: new-postman-doc
+  function:
+    - key: resolver
+      handler: index.handler
+resources:
+  - key: main
+    path: src/frontend/index.jsx
+  - key: macro-config
+    path: src/frontend/config.jsx
+  - key: space-function-page
+    path: src/frontend/spacePage.jsx
+
+app:
+  runtime:
+    name: nodejs22.x
+    memoryMB: 256
+    architecture: arm64
+  id: ari:cloud:ecosystem::app/15d3992b-e2bd-43b8-a86b-f383e25d8247
+permissions:
+  scopes:
+    - storage:app
+    - write:confluence-content
+    - write:page:confluence
+
+  external:
+    fetch:
+      backend:
+        - api.getpostman.com
